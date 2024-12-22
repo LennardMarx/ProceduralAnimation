@@ -4,7 +4,7 @@
 Animal::Animal() {
   linkLength = 30.0f;
   speed = 0.04f;
-  minAngle = 60.0f * M_PI / 180.0f;
+  minAngle = 20.0f * M_PI / 180.0f;
   // Initialize body segments
   float segmentSizes[12] = {25, 20, 20, 25, 30, 30, 20, 15, 10, 10, 5, 0};
   for (int i = 0; i < sizeof(body) / sizeof(body[0]); i++) {
@@ -42,10 +42,30 @@ void Animal::moveBody(int link) {
   float dy = body[link - 1].pos[1] - body[link].pos[1];
   float distance = sqrt(dx * dx + dy * dy);
 
-  body[link].pos[0] = body[link - 1].pos[0] - dx / distance * linkLength;
-  body[link].pos[1] = body[link - 1].pos[1] - dy / distance * linkLength;
-
   body[link - 1].angle = atan2(dy, dx);
+
+  // body[link].pos[0] = body[link - 1].pos[0] - dx / distance * linkLength;
+  // body[link].pos[1] = body[link - 1].pos[1] - dy / distance * linkLength;
+
+  if (link > 2) {
+    float angleDiff = body[link - 1].angle - body[link - 2].angle;
+    std::cout << "Angle Diff: " << angleDiff << std::endl;
+    if (angleDiff > minAngle) {
+      body[link - 1].angle = body[link - 2].angle + minAngle;
+    } else if (angleDiff < -minAngle) {
+      body[link - 1].angle = body[link - 2].angle - minAngle;
+    }
+  }
+
+  body[link].pos[0] =
+      body[link - 1].pos[0] - cos(body[link - 1].angle) * linkLength;
+  body[link].pos[1] =
+      body[link - 1].pos[1] - sin(body[link - 1].angle) * linkLength;
+
+  // print angles
+  // if (link <= 2)
+  //   std::cout << "Angle " << link - 1 << ": "
+  //             << body[link - 1].angle / M_PI * 180.0 << std::endl;
 
   moveBody(link + 1);
 }
