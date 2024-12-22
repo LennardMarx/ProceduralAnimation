@@ -3,7 +3,7 @@
 
 Animal::Animal() {
   linkLength = 30.0f;
-  speed = 0.04f;
+  speed = 0.03f;
   minAngle = 30.0f * M_PI / 180.0f;
   // Initialize body segments
   float segmentSizes[12] = {25, 20, 20, 25, 30, 30, 20, 15, 10, 10, 5, 0};
@@ -21,11 +21,6 @@ void Animal::followMouse(UI *ui) {
   body[0].pos[1] += (ui->mouseY - body[0].pos[1]) * speed;
 
   moveBody(1);
-
-  // print angles
-  // for (int i = 0; i < sizeof(body) / sizeof(body[0]); i++) {
-  //   std::cout << "Angle " << i << ": " << body[i].angle << std::endl;
-  // }
 
   calculateDrawPoints();
 
@@ -52,8 +47,8 @@ void Animal::moveBody(int link) {
 
   body[link - 1].angle = normalizeAngle(atan2(dy, dx));
 
-  std::cout << "Link: " << link << " Angle: " << body[link - 1].angle
-            << std::endl;
+  // std::cout << "Link: " << link << " Angle: " << body[link - 1].angle
+  //           << std::endl;
 
   if (link > 1) {
     float angleDiff =
@@ -135,8 +130,7 @@ void Animal::drawLinks(UI *ui) {
                        drawPoints[i].right[1], drawPoints[i + 1].right[0],
                        drawPoints[i + 1].right[1]);
   }
-  // draw circle at head
-  // ui->DrawCircle(body[0].pos[0], body[0].pos[1], body[0].size);
+
   // draw head
   SDL_RenderDrawLine(ui->getRenderer(), drawPoints[0].left[0],
                      drawPoints[0].left[1], head.drawPoints[0].x,
@@ -156,4 +150,20 @@ void Animal::drawLinks(UI *ui) {
   SDL_RenderDrawLine(ui->getRenderer(), head.drawPoints[4].x,
                      head.drawPoints[4].y, drawPoints[0].right[0],
                      drawPoints[0].right[1]);
+
+  // Eyes
+  // SDL_RenderDrawPoint(
+  //     ui->getRenderer(),
+  //     body[0].pos[0] + body[0].size / 2 * cos(body[0].angle + M_PI / 3),
+  //     body[0].pos[1] + body[0].size / 2 * sin(body[0].angle + M_PI / 3));
+  // SDL_RenderDrawPoint(
+  //     ui->getRenderer(),
+  //     body[0].pos[0] + body[0].size / 2 * cos(body[0].angle - M_PI / 3),
+  //     body[0].pos[1] + body[0].size / 2 * sin(body[0].angle - M_PI / 3));
+  ui->DrawCircle(
+      body[0].pos[0] + body[0].size / 2 * cos(body[0].angle + M_PI / 3),
+      body[0].pos[1] + body[0].size / 2 * sin(body[0].angle + M_PI / 3), 3);
+  ui->DrawCircle(
+      body[0].pos[0] + body[0].size / 2 * cos(body[0].angle - M_PI / 3),
+      body[0].pos[1] + body[0].size / 2 * sin(body[0].angle - M_PI / 3), 3);
 }

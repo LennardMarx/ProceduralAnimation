@@ -28,8 +28,6 @@ static void mainLoop(void *arg) {
   ctx->ui->eventChecks();
 
   ctx->animal->followMouse(ctx->ui);
-  // SDL_RenderDrawLine(ctx->ui->getRenderer(), 0, 0, ctx->ui->mouseX,
-  //                    ctx->ui->mouseY);
 
   SDL_RenderPresent(ctx->ui->getRenderer());
 }
