@@ -16,6 +16,8 @@ public:
 
   void clear();
   void DrawCircle(int32_t centreX, int32_t centreY, int32_t radius);
+  void DrawArc(int32_t centreX, int32_t centreY, int32_t radius,
+               float startAngle, float endAngle);
   SDL_Renderer *&getRenderer(); // pointer reference to the renderer
   SDL_Window *getWindow();      // pointer to the window
   bool getQuit();
