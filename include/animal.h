@@ -2,53 +2,34 @@
 #define ANIMAL_H
 
 #include <UI.h>
-#include <iostream>
+
+struct Segment {
+  Segment() {
+    pos[0] = 0.0f;
+    pos[1] = 0.0f;
+    angle = 0.0f;
+  }
+  float pos[2];
+  float angle;
+  float size;
+};
 
 class Animal {
 public:
-  Animal() {
-    head[0] = 0.0f;
-    head[1] = 0.0f;
-    tail[0] = 0.0f;
-    tail[1] = 0.0f;
-    length = 30.0f;
-  }
-  ~Animal() {}
+  Animal();
+  ~Animal();
 
-  void followMouse(UI *ui) {
-    head[0] = ui->mouseX;
-    head[1] = ui->mouseY;
-    moveTail();
-    draw(ui);
-  }
-
-  // move tail in direction of head if distance is greater than length
-  void moveTail() {
-    float dx = head[0] - tail[0];
-    float dy = head[1] - tail[1];
-    float distance = sqrt(dx * dx + dy * dy);
-
-    // instant movement
-    if (distance > length) {
-      tail[0] = head[0] - dx / distance * length;
-      tail[1] = head[1] - dy / distance * length;
-    }
-
-    // if (distance > length) {
-    //   tail[0] += dx / distance;
-    //   tail[1] += dy / distance;
-    // }
-  }
-
-  // draw head and tail
-  void draw(UI *ui) {
-    SDL_RenderDrawLine(ui->getRenderer(), head[0], head[1], tail[0], tail[1]);
-  }
+  void followMouse(UI *ui);
+  void moveBody(int link);
+  void drawLinks(UI *ui);
 
 private:
-  float head[2];
-  float tail[2];
-  float length;
+  float linkLength;
+  float minAngle;
+  float speed;
+
+  static const int numJoints = 10;
+  Segment body[numJoints];
 };
 
 #endif // ANIMAL_H

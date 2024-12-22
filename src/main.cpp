@@ -6,10 +6,6 @@
 #include <emscripten.h>
 #endif
 
-// struct context {
-//   UI *ui = new UI(800, 600);
-//   // UI ui = UI(800, 600);
-// };
 struct context {
   UI *ui = nullptr;
   Animal *animal = nullptr;

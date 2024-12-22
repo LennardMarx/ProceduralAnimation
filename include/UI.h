@@ -15,6 +15,7 @@ public:
   ~UI();
 
   void clear();
+  void DrawCircle(int32_t centreX, int32_t centreY, int32_t radius);
   SDL_Renderer *&getRenderer(); // pointer reference to the renderer
   SDL_Window *getWindow();      // pointer to the window
   bool getQuit();
