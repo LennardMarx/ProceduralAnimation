@@ -6,7 +6,8 @@ Animal::Animal() {
   speed = 0.03f;
   minAngle = 30.0f * M_PI / 180.0f;
   // Initialize body segments
-  float segmentSizes[12] = {25, 20, 20, 25, 30, 30, 20, 15, 10, 10, 5, 0};
+  float segmentSizes[sizeof(body) / sizeof(body[0])] = {25, 20, 20, 25, 30, 30,
+                                                        20, 15, 10, 10, 5,  0};
   for (int i = 0; i < sizeof(body) / sizeof(body[0]); i++) {
     body[i].pos[0] = 300.0f;
     body[i].pos[1] = i * -linkLength; // Stack segments vertically
