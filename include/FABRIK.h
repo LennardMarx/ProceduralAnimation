@@ -3,31 +3,39 @@
 #define FABRIK_H
 
 #include <UI.h>
-#include <animal.h>
+#include <Vec2.h>
+// #include <animal.h>
 
-struct Link {
-  Vec2 start;
-  Vec2 end;
-};
+// struct Link {
+//   Vec2 start;
+//   Vec2 end;
+// };
 
 class RobotArm {
 public:
   RobotArm() {
-    links[0].start = {200, 200};
-    links[0].end = {300, 200};
-    links[1].start = {300, 200};
-    links[1].end = {400, 200};
+    // links[0].start = {200, 200};
+    // links[0].end = {300, 200};
+    // links[1].start = {300, 200};
+    // links[1].end = {400, 200};
+    joints[0] = {200, 200};
+    joints[1] = {300, 200};
+    joints[2] = {400, 200};
   }
   ~RobotArm() {}
 
   void draw(UI *ui) {
     for (int i = 0; i < 2; i++) {
-      SDL_RenderDrawLine(ui->getRenderer(), links[i].start.x, links[i].start.y,
-                         links[i].end.x, links[i].end.y);
+      // SDL_RenderDrawLine(ui->getRenderer(), links[i].start.x,
+      // links[i].start.y,
+      //                    links[i].end.x, links[i].end.y);
+      SDL_RenderDrawLine(ui->getRenderer(), joints[i].x, joints[i].y,
+                         joints[i + 1].x, joints[i + 1].y);
     }
   }
 
-  Link links[2];
+  // Link links[2];
+  Vec2 joints[3];
 
 private:
 };
@@ -37,53 +45,52 @@ public:
   FABRIK() {}
   ~FABRIK() {}
 
-  void solve(RobotArm *arm) {
-    for (int i = 0; i < 10; i++) {
-      pullToTraget(arm);
-      pullToBase(arm);
-    }
+  void solve(Vec2 joints[3]) {
+    // for (int i = 0; i < 10; i++) {
+    pullToTraget(joints);
+    pullToBase(joints);
+    // }
   }
   void setTarget(Vec2 t) { target = t; }
   void setBase(Vec2 b) { base = b; }
-  void pullToTraget(RobotArm *arm) {
-    arm->links[1].end = target;
-    float dx = arm->links[1].end.x - arm->links[1].start.x;
-    float dy = arm->links[1].end.y - arm->links[1].start.y;
+  // void pullToTraget(RobotArm *arm) {
+  void pullToTraget(Vec2 joints[3]) {
+    joints[2] = target;
+
+    float dx = joints[2].x - joints[1].x;
+    float dy = joints[2].y - joints[1].y;
     float distance = sqrt(dx * dx + dy * dy);
     float angle = atan2(dy, dx);
 
-    arm->links[1].start.x = arm->links[1].end.x - cos(angle) * 100;
-    arm->links[1].start.y = arm->links[1].end.y - sin(angle) * 100;
+    joints[1].x = joints[2].x - cos(angle) * 30;
+    joints[1].y = joints[2].y - sin(angle) * 30;
 
-    arm->links[0].end = arm->links[1].start;
-
-    dx = arm->links[0].end.x - arm->links[0].start.x;
-    dy = arm->links[0].end.y - arm->links[0].start.y;
+    dx = joints[1].x - joints[0].x;
+    dy = joints[1].y - joints[0].y;
     distance = sqrt(dx * dx + dy * dy);
     angle = atan2(dy, dx);
 
-    arm->links[0].start.x = arm->links[0].end.x - cos(angle) * 100;
-    arm->links[0].start.y = arm->links[0].end.y - sin(angle) * 100;
+    joints[0].x = joints[1].x - cos(angle) * 30;
+    joints[0].y = joints[1].y - sin(angle) * 30;
   }
-  void pullToBase(RobotArm *arm) {
-    arm->links[0].start = base;
-    float dx = arm->links[0].end.x - arm->links[0].start.x;
-    float dy = arm->links[0].end.y - arm->links[0].start.y;
+  // void pullToBase(RobotArm *arm) {
+  void pullToBase(Vec2 joints[3]) {
+    joints[0] = base;
+    float dx = joints[1].x - joints[0].x;
+    float dy = joints[1].y - joints[0].y;
     float distance = sqrt(dx * dx + dy * dy);
     float angle = atan2(dy, dx);
 
-    arm->links[0].end.x = arm->links[0].start.x + cos(angle) * 100;
-    arm->links[0].end.y = arm->links[0].start.y + sin(angle) * 100;
+    joints[1].x = joints[0].x + cos(angle) * 30;
+    joints[1].y = joints[0].y + sin(angle) * 30;
 
-    arm->links[1].start = arm->links[0].end;
-
-    dx = arm->links[1].end.x - arm->links[1].start.x;
-    dy = arm->links[1].end.y - arm->links[1].start.y;
+    dx = joints[2].x - joints[1].x;
+    dy = joints[2].y - joints[1].y;
     distance = sqrt(dx * dx + dy * dy);
     angle = atan2(dy, dx);
 
-    arm->links[1].end.x = arm->links[1].start.x + cos(angle) * 100;
-    arm->links[1].end.y = arm->links[1].start.y + sin(angle) * 100;
+    joints[2].x = joints[1].x + cos(angle) * 30;
+    joints[2].y = joints[1].y + sin(angle) * 30;
   }
 
   void draw(UI *ui) {
@@ -91,11 +98,13 @@ public:
     // target.y);
     ui->DrawCircle(base.x, base.y, 10);
     ui->DrawCircle(target.x, target.y, 5);
+    ui->DrawCircle(nextTarget.x, nextTarget.y, 3);
   }
 
   RobotArm *arm;
   Vec2 base;
   Vec2 target;
+  Vec2 nextTarget;
   bool isSet = 0;
 
 private:

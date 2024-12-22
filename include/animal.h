@@ -1,12 +1,16 @@
 #ifndef ANIMAL_H
 #define ANIMAL_H
 
+#include <FABRIK.h>
 #include <UI.h>
+#include <Vec2.h>
 #include <cmath>
 
-struct Vec2 {
-  float x;
-  float y;
+struct Leg {
+  Vec2 pos[3];
+  Vec2 target;
+  float length;
+  FABRIK fabrik;
 };
 
 struct Head {
@@ -14,8 +18,10 @@ struct Head {
 };
 
 struct DrawPoint {
-  float left[2];
-  float right[2];
+  Vec2 left;
+  Vec2 right;
+  // float left[2];
+  // float right[2];
 };
 
 struct Segment {
@@ -27,7 +33,8 @@ struct Segment {
   float pos[2];
   float angle;
   float size;
-  float drawPoints[2];
+  // float drawPoints[2];
+  // Vec2 drawPoints;
 };
 
 class Animal {
@@ -40,6 +47,8 @@ public:
   void drawLinks(UI *ui);
   void calculateDrawPoints();
   float normalizeAngle(float angle);
+  void moveLegs();
+  void drawLegs(UI *ui);
 
 private:
   float linkLength;
@@ -50,6 +59,7 @@ private:
   Segment body[numJoints];
   DrawPoint drawPoints[numJoints];
   Head head;
+  Leg legs[4];
 };
 
 #endif // ANIMAL_H
