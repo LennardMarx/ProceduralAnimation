@@ -2,6 +2,7 @@
 #define ANIMAL_H
 
 #include <UI.h>
+#include <cmath>
 
 struct Vec2 {
   float x;
@@ -38,6 +39,7 @@ public:
   void moveBody(int link);
   void drawLinks(UI *ui);
   void calculateDrawPoints();
+  float normalizeAngle(float angle);
 
 private:
   float linkLength;
