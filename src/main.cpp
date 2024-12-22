@@ -14,7 +14,7 @@ struct context {
   FABRIK *fabrik = nullptr;
 
   context() {
-    ui = new UI(800, 600); // Dynamically allocate
+    ui = new UI(1200, 800); // Dynamically allocate
     animal = new Animal();
     robotArm = new RobotArm();
     fabrik = new FABRIK();

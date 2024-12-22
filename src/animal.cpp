@@ -36,14 +36,14 @@ void Animal::moveLegs() {
   legs[2].pos[0] = drawPoints[7].left;
   legs[3].pos[0] = drawPoints[7].right;
   // outside dependent on angle
-  legs[0].target.x = body[3].pos[0] + 60 * cos(body[3].angle + M_PI / 2.5);
-  legs[0].target.y = body[3].pos[1] + 60 * sin(body[3].angle + M_PI / 2.5);
-  legs[1].target.x = body[3].pos[0] + 60 * cos(body[3].angle - M_PI / 2.5);
-  legs[1].target.y = body[3].pos[1] + 60 * sin(body[3].angle - M_PI / 2.5);
-  legs[2].target.x = body[7].pos[0] + 60 * cos(body[7].angle + M_PI / 2.5);
-  legs[2].target.y = body[7].pos[1] + 60 * sin(body[7].angle + M_PI / 2.5);
-  legs[3].target.x = body[7].pos[0] + 60 * cos(body[7].angle - M_PI / 2.5);
-  legs[3].target.y = body[7].pos[1] + 60 * sin(body[7].angle - M_PI / 2.5);
+  legs[0].target.x = body[3].pos[0] + 60 * cos(body[3].angle + M_PI / 3);
+  legs[0].target.y = body[3].pos[1] + 60 * sin(body[3].angle + M_PI / 3);
+  legs[1].target.x = body[3].pos[0] + 60 * cos(body[3].angle - M_PI / 3);
+  legs[1].target.y = body[3].pos[1] + 60 * sin(body[3].angle - M_PI / 3);
+  legs[2].target.x = body[7].pos[0] + 60 * cos(body[7].angle + M_PI / 3);
+  legs[2].target.y = body[7].pos[1] + 60 * sin(body[7].angle + M_PI / 3);
+  legs[3].target.x = body[7].pos[0] + 60 * cos(body[7].angle - M_PI / 3);
+  legs[3].target.y = body[7].pos[1] + 60 * sin(body[7].angle - M_PI / 3);
 
   for (int i = 0; i < 4; i++) {
     // float dx = legs[i].pos[2].x - legs[i].target.x;
@@ -55,7 +55,7 @@ void Animal::moveLegs() {
     float dx = legs[i].fabrik.target.x - legs[i].target.x;
     float dy = legs[i].fabrik.target.y - legs[i].target.y;
     float distance = sqrt(dx * dx + dy * dy);
-    std::cout << "Distance: " << distance << std::endl;
+    // std::cout << "Distance: " << distance << std::endl;
     if (distance > 60) {
       legs[i].fabrik.setTarget(legs[i].target);
     }
