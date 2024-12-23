@@ -6,22 +6,24 @@
 #include <Vec2.h>
 #include <cmath>
 
-struct Leg {
-  Vec2 pos[3];
-  Vec2 target;
-  float length;
-  FABRIK fabrik;
-};
-
-struct Head {
-  Vec2 drawPoints[5];
-};
-
 struct DrawPoint {
   Vec2 left;
   Vec2 right;
   // float left[2];
   // float right[2];
+};
+
+struct Leg {
+  Vec2 pos[3];
+  Vec2 target;
+  Vec2 elbowTarget;
+  float length;
+  DrawPoint drawPoints[3];
+  FABRIK fabrik;
+};
+
+struct Head {
+  Vec2 drawPoints[5];
 };
 
 struct Segment {
@@ -55,7 +57,7 @@ private:
   float minAngle;
   float speed;
 
-  static const int numJoints = 12;
+  static const int numJoints = 20;
   Segment body[numJoints];
   DrawPoint drawPoints[numJoints];
   Head head;

@@ -47,11 +47,15 @@ public:
 
   void solve(Vec2 joints[3]) {
     // for (int i = 0; i < 10; i++) {
-    pullToTraget(joints);
-    pullToBase(joints);
+    pullElbow(joints);
+    for (int i = 0; i < 10; i++) {
+      pullToTraget(joints);
+      pullToBase(joints);
+    }
     // }
   }
   void setTarget(Vec2 t) { target = t; }
+  void setElbowTarget(Vec2 t) { elbowTarget = t; }
   void setBase(Vec2 b) { base = b; }
   // void pullToTraget(RobotArm *arm) {
   void pullToTraget(Vec2 joints[3]) {
@@ -92,6 +96,24 @@ public:
     joints[2].x = joints[1].x + cos(angle) * 30;
     joints[2].y = joints[1].y + sin(angle) * 30;
   }
+  void pullElbow(Vec2 joints[3]) {
+    joints[1] = elbowTarget;
+    float dx = joints[0].x - joints[1].x;
+    float dy = joints[0].y - joints[1].y;
+    float distance = sqrt(dx * dx + dy * dy);
+    float angle = atan2(dy, dx);
+
+    joints[0].x = joints[1].x - cos(angle) * 30;
+    joints[0].y = joints[1].y - sin(angle) * 30;
+
+    dx = joints[2].x - joints[1].x;
+    dy = joints[2].y - joints[1].y;
+    distance = sqrt(dx * dx + dy * dy);
+    angle = atan2(dy, dx);
+
+    joints[2].x = joints[1].x + cos(angle) * 30;
+    joints[2].y = joints[1].y + sin(angle) * 30;
+  }
 
   void draw(UI *ui) {
     // SDL_RenderDrawLine(ui->getRenderer(), base.x, base.y, target.x,
@@ -104,6 +126,7 @@ public:
   RobotArm *arm;
   Vec2 base;
   Vec2 target;
+  Vec2 elbowTarget;
   Vec2 nextTarget;
   bool isSet = 0;
 

@@ -2,12 +2,13 @@
 #include <iostream>
 
 Animal::Animal() {
-  linkLength = 30.0f;
+  linkLength = 15.0f;
   speed = 0.03f;
-  minAngle = 30.0f * M_PI / 180.0f;
+  minAngle = 20.0f * M_PI / 180.0f;
   // Initialize body segments
-  float segmentSizes[sizeof(body) / sizeof(body[0])] = {25, 20, 20, 25, 30, 30,
-                                                        20, 15, 10, 10, 5,  0};
+  float segmentSizes[sizeof(body) / sizeof(body[0])] = {
+      27, 25, 22, 20, 23, 27, 30, 32, 32, 30,
+      27, 23, 20, 15, 12, 10, 7,  5,  3,  0};
   for (int i = 0; i < sizeof(body) / sizeof(body[0]); i++) {
     body[i].pos[0] = 300.0f;
     body[i].pos[1] = i * -linkLength; // Stack segments vertically
@@ -31,19 +32,28 @@ void Animal::followMouse(UI *ui) {
 }
 
 void Animal::moveLegs() {
-  legs[0].pos[0] = drawPoints[3].left;
-  legs[1].pos[0] = drawPoints[3].right;
-  legs[2].pos[0] = drawPoints[7].left;
-  legs[3].pos[0] = drawPoints[7].right;
+  legs[0].pos[0] = drawPoints[5].left;
+  legs[1].pos[0] = drawPoints[5].right;
+  legs[2].pos[0] = drawPoints[12].left;
+  legs[3].pos[0] = drawPoints[12].right;
   // outside dependent on angle
-  legs[0].target.x = body[3].pos[0] + 60 * cos(body[3].angle + M_PI / 3);
-  legs[0].target.y = body[3].pos[1] + 60 * sin(body[3].angle + M_PI / 3);
-  legs[1].target.x = body[3].pos[0] + 60 * cos(body[3].angle - M_PI / 3);
-  legs[1].target.y = body[3].pos[1] + 60 * sin(body[3].angle - M_PI / 3);
-  legs[2].target.x = body[7].pos[0] + 60 * cos(body[7].angle + M_PI / 3);
-  legs[2].target.y = body[7].pos[1] + 60 * sin(body[7].angle + M_PI / 3);
-  legs[3].target.x = body[7].pos[0] + 60 * cos(body[7].angle - M_PI / 3);
-  legs[3].target.y = body[7].pos[1] + 60 * sin(body[7].angle - M_PI / 3);
+  legs[0].target.x = body[5].pos[0] + 60 * cos(body[5].angle + M_PI / 3);
+  legs[0].target.y = body[5].pos[1] + 60 * sin(body[5].angle + M_PI / 3);
+  legs[1].target.x = body[5].pos[0] + 60 * cos(body[5].angle - M_PI / 3);
+  legs[1].target.y = body[5].pos[1] + 60 * sin(body[5].angle - M_PI / 3);
+  legs[2].target.x = body[12].pos[0] + 40 * cos(body[12].angle + M_PI / 2);
+  legs[2].target.y = body[12].pos[1] + 40 * sin(body[12].angle + M_PI / 2);
+  legs[3].target.x = body[12].pos[0] + 40 * cos(body[12].angle - M_PI / 2);
+  legs[3].target.y = body[12].pos[1] + 40 * sin(body[12].angle - M_PI / 2);
+
+  legs[0].elbowTarget.x = body[5].pos[0] + 40 * cos(body[5].angle + M_PI / 1.5);
+  legs[0].elbowTarget.y = body[5].pos[1] + 40 * sin(body[5].angle + M_PI / 1.5);
+  legs[1].elbowTarget.x = body[5].pos[0] + 40 * cos(body[5].angle - M_PI / 1.5);
+  legs[1].elbowTarget.y = body[5].pos[1] + 40 * sin(body[5].angle - M_PI / 1.5);
+  legs[2].elbowTarget.x = body[12].pos[0] + 50 * cos(body[12].angle + M_PI / 3);
+  legs[2].elbowTarget.y = body[12].pos[1] + 50 * sin(body[12].angle + M_PI / 3);
+  legs[3].elbowTarget.x = body[12].pos[0] + 50 * cos(body[12].angle - M_PI / 3);
+  legs[3].elbowTarget.y = body[12].pos[1] + 50 * sin(body[12].angle - M_PI / 3);
 
   for (int i = 0; i < 4; i++) {
     // float dx = legs[i].pos[2].x - legs[i].target.x;
@@ -56,8 +66,9 @@ void Animal::moveLegs() {
     float dy = legs[i].fabrik.target.y - legs[i].target.y;
     float distance = sqrt(dx * dx + dy * dy);
     // std::cout << "Distance: " << distance << std::endl;
-    if (distance > 60) {
+    if (distance > 40) {
       legs[i].fabrik.setTarget(legs[i].target);
+      legs[i].fabrik.setElbowTarget(legs[i].elbowTarget);
     }
     legs[i].fabrik.setBase(legs[i].pos[0]);
     legs[i].fabrik.solve(legs[i].pos);
@@ -68,10 +79,15 @@ void Animal::drawLegs(UI *ui) {
   for (int i = 0; i < 4; i++) {
     // ui->DrawCircle(legs[i].pos[0].x, legs[i].pos[0].y, 5);
     // ui->DrawCircle(legs[i].target.x, legs[i].target.y, 5);
+    // ui->DrawCircle(legs[i].elbowTarget.x, legs[i].elbowTarget.y, 3);
     SDL_RenderDrawLine(ui->getRenderer(), legs[i].pos[0].x, legs[i].pos[0].y,
                        legs[i].pos[1].x, legs[i].pos[1].y);
     SDL_RenderDrawLine(ui->getRenderer(), legs[i].pos[1].x, legs[i].pos[1].y,
                        legs[i].pos[2].x, legs[i].pos[2].y);
+
+    ui->DrawCircle(legs[i].pos[0].x, legs[i].pos[0].y, 7);
+    ui->DrawCircle(legs[i].pos[1].x, legs[i].pos[1].y, 7);
+    ui->DrawCircle(legs[i].pos[2].x, legs[i].pos[2].y, 7);
   }
 }
 
