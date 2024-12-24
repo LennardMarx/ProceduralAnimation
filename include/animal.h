@@ -17,8 +17,9 @@ struct Leg {
   Vec2 pos[3];
   Vec2 target;
   Vec2 elbowTarget;
+  float angles[2];
   float length;
-  DrawPoint drawPoints[3];
+  DrawPoint drawPoints[4];
   FABRIK fabrik;
 };
 

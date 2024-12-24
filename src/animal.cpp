@@ -56,15 +56,21 @@ void Animal::moveLegs() {
   legs[3].elbowTarget.y = body[12].pos[1] + 50 * sin(body[12].angle - M_PI / 3);
 
   for (int i = 0; i < 4; i++) {
-    // float dx = legs[i].pos[2].x - legs[i].target.x;
-    // float dy = legs[i].pos[2].y - legs[i].target.y;
-    // if (!fabrik.isSet) {
-    //   fabrik.setTarget(legs[i].target);
-    //   fabrik.isSet = true;
-    // }
-    float dx = legs[i].fabrik.target.x - legs[i].target.x;
-    float dy = legs[i].fabrik.target.y - legs[i].target.y;
+    // Angles
+    float dx = legs[i].pos[1].x - legs[i].pos[0].x;
+    float dy = legs[i].pos[1].y - legs[i].pos[0].y;
     float distance = sqrt(dx * dx + dy * dy);
+    legs[i].angles[0] = atan2(dy, dx);
+    dx = legs[i].pos[2].x - legs[i].pos[1].x;
+    dy = legs[i].pos[2].y - legs[i].pos[1].y;
+    distance = sqrt(dx * dx + dy * dy);
+    legs[i].angles[1] = atan2(dy, dx);
+
+    // FABRIK
+    dx = legs[i].fabrik.target.x - legs[i].target.x;
+    dy = legs[i].fabrik.target.y - legs[i].target.y;
+    distance = sqrt(dx * dx + dy * dy);
+
     // std::cout << "Distance: " << distance << std::endl;
     if (distance > 40) {
       legs[i].fabrik.setTarget(legs[i].target);
@@ -73,6 +79,10 @@ void Animal::moveLegs() {
     legs[i].fabrik.setBase(legs[i].pos[0]);
     legs[i].fabrik.solve(legs[i].pos);
   }
+  // leg 0 angles
+  // std::cout << "Leg 0 angles: " << legs[0].angles[0] << " " <<
+  // legs[0].angles[1]
+  //           << std::endl;
 }
 
 void Animal::drawLegs(UI *ui) {
@@ -80,14 +90,36 @@ void Animal::drawLegs(UI *ui) {
     // ui->DrawCircle(legs[i].pos[0].x, legs[i].pos[0].y, 5);
     // ui->DrawCircle(legs[i].target.x, legs[i].target.y, 5);
     // ui->DrawCircle(legs[i].elbowTarget.x, legs[i].elbowTarget.y, 3);
-    SDL_RenderDrawLine(ui->getRenderer(), legs[i].pos[0].x, legs[i].pos[0].y,
-                       legs[i].pos[1].x, legs[i].pos[1].y);
-    SDL_RenderDrawLine(ui->getRenderer(), legs[i].pos[1].x, legs[i].pos[1].y,
-                       legs[i].pos[2].x, legs[i].pos[2].y);
+    // SDL_RenderDrawLine(ui->getRenderer(), legs[i].pos[0].x, legs[i].pos[0].y,
+    //                    legs[i].pos[1].x, legs[i].pos[1].y);
+    // SDL_RenderDrawLine(ui->getRenderer(), legs[i].pos[1].x, legs[i].pos[1].y,
+    //                    legs[i].pos[2].x, legs[i].pos[2].y);
 
     ui->DrawCircle(legs[i].pos[0].x, legs[i].pos[0].y, 7);
     ui->DrawCircle(legs[i].pos[1].x, legs[i].pos[1].y, 7);
     ui->DrawCircle(legs[i].pos[2].x, legs[i].pos[2].y, 7);
+
+    SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[0].left.x,
+                       legs[i].drawPoints[0].left.y,
+                       legs[i].drawPoints[1].left.x,
+                       legs[i].drawPoints[1].left.y);
+    // SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[1].left.x,
+    //                    legs[i].drawPoints[1].left.y,
+    //                    legs[i].drawPoints[2].left.x,
+    //                    legs[i].drawPoints[2].left.y);
+    SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[0].right.x,
+                       legs[i].drawPoints[0].right.y,
+                       legs[i].drawPoints[1].right.x,
+                       legs[i].drawPoints[1].right.y);
+    SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[2].right.x,
+                       legs[i].drawPoints[2].right.y,
+                       legs[i].drawPoints[3].right.x,
+                       legs[i].drawPoints[3].right.y);
+
+    SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[2].left.x,
+                       legs[i].drawPoints[2].left.y,
+                       legs[i].drawPoints[3].left.x,
+                       legs[i].drawPoints[3].left.y);
   }
 }
 
@@ -163,6 +195,41 @@ void Animal::calculateDrawPoints() {
       body[0].pos[0] + body[0].size * cos(body[0].angle - M_PI / 3);
   head.drawPoints[4].y =
       body[0].pos[1] + body[0].size * sin(body[0].angle - M_PI / 3);
+
+  for (int i = 0; i < 4; i++) {
+    legs[i].drawPoints[0].left.x =
+        legs[i].pos[0].x + 7 * cos(legs[i].angles[0] + M_PI / 2);
+    legs[i].drawPoints[0].left.y =
+        legs[i].pos[0].y + 7 * sin(legs[i].angles[0] + M_PI / 2);
+    legs[i].drawPoints[0].right.x =
+        legs[i].pos[0].x - 7 * cos(legs[i].angles[0] + M_PI / 2);
+    legs[i].drawPoints[0].right.y =
+        legs[i].pos[0].y - 7 * sin(legs[i].angles[0] + M_PI / 2);
+    legs[i].drawPoints[1].left.x =
+        legs[i].pos[1].x + 7 * cos(legs[i].angles[0] + M_PI / 2);
+    legs[i].drawPoints[1].left.y =
+        legs[i].pos[1].y + 7 * sin(legs[i].angles[0] + M_PI / 2);
+    legs[i].drawPoints[1].right.x =
+        legs[i].pos[1].x - 7 * cos(legs[i].angles[0] + M_PI / 2);
+    legs[i].drawPoints[1].right.y =
+        legs[i].pos[1].y - 7 * sin(legs[i].angles[0] + M_PI / 2);
+    legs[i].drawPoints[2].left.x =
+        legs[i].pos[1].x + 7 * cos(legs[i].angles[1] + M_PI / 2);
+    legs[i].drawPoints[2].left.y =
+        legs[i].pos[1].y + 7 * sin(legs[i].angles[1] + M_PI / 2);
+    legs[i].drawPoints[2].right.x =
+        legs[i].pos[1].x - 7 * cos(legs[i].angles[1] + M_PI / 2);
+    legs[i].drawPoints[2].right.y =
+        legs[i].pos[1].y - 7 * sin(legs[i].angles[1] + M_PI / 2);
+    legs[i].drawPoints[3].left.x =
+        legs[i].pos[2].x + 7 * cos(legs[i].angles[1] + M_PI / 2);
+    legs[i].drawPoints[3].left.y =
+        legs[i].pos[2].y + 7 * sin(legs[i].angles[1] + M_PI / 2);
+    legs[i].drawPoints[3].right.x =
+        legs[i].pos[2].x - 7 * cos(legs[i].angles[1] + M_PI / 2);
+    legs[i].drawPoints[3].right.y =
+        legs[i].pos[2].y - 7 * sin(legs[i].angles[1] + M_PI / 2);
+  }
 }
 
 void Animal::drawLinks(UI *ui) {
@@ -230,4 +297,22 @@ void Animal::drawLinks(UI *ui) {
   ui->DrawCircle(
       body[0].pos[0] + body[0].size / 2 * cos(body[0].angle - M_PI / 3),
       body[0].pos[1] + body[0].size / 2 * sin(body[0].angle - M_PI / 3), 3);
+
+  // Legs
+  // ui->DrawCircle(legs[0].drawPoints[0].left.x, legs[0].drawPoints[0].left.y,
+  // 3); ui->DrawCircle(legs[0].drawPoints[0].right.x,
+  // legs[0].drawPoints[0].right.y,
+  //                3);
+  // ui->DrawCircle(legs[0].drawPoints[1].left.x, legs[0].drawPoints[1].left.y,
+  // 3); ui->DrawCircle(legs[0].drawPoints[1].right.x,
+  // legs[0].drawPoints[1].right.y,
+  //                3);
+  // ui->DrawCircle(legs[0].drawPoints[2].left.x, legs[0].drawPoints[2].left.y,
+  // 3); ui->DrawCircle(legs[0].drawPoints[2].right.x,
+  // legs[0].drawPoints[2].right.y,
+  //                3);
+  // ui->DrawCircle(legs[0].drawPoints[3].left.x, legs[0].drawPoints[3].left.y,
+  // 3); ui->DrawCircle(legs[0].drawPoints[3].right.x,
+  // legs[0].drawPoints[3].right.y,
+  //                3);
 }
