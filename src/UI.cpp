@@ -55,6 +55,23 @@ void UI::DrawCircle(int32_t centreX, int32_t centreY, int32_t radius) {
   }
 }
 
+void UI::DrawArc(Vec2 center, float radius, float startAngle, float endAngle) {
+  int degrees = (endAngle - startAngle) * 180 / M_PI;
+  // start point
+  float x_prev = center.x + radius * cos(startAngle);
+  float y_prev = center.y + radius * sin(startAngle);
+  // for (int i = 0; i < degrees; i++) {
+  for (int i = 0; i < degrees; i = i + 3) {
+    float angle = startAngle + i * M_PI / 180;
+    float x = center.x + radius * cos(angle);
+    float y = center.y + radius * sin(angle);
+    // SDL_RenderDrawPoint(renderer, x, y);
+    SDL_RenderDrawLine(renderer, x_prev, y_prev, x, y);
+    x_prev = x;
+    y_prev = y;
+  }
+}
+
 void UI::DrawArc(int32_t centreX, int32_t centreY, int32_t radius,
                  float startAngle, float endAngle) {
   const int32_t diameter = (radius * 2);

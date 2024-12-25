@@ -26,6 +26,8 @@ struct Bone {
 
 struct Leg {
   std::deque<Segment> segments;
+  Vec2 target;
+  Vec2 elbowTarget;
 
   Bone bones[2];
   Vec2 pos[3];
@@ -34,8 +36,6 @@ struct Leg {
   DrawPoint drawPoints[4];
 
   FABRIK fabrik;
-  Vec2 target;
-  Vec2 elbowTarget;
 };
 
 struct Head {

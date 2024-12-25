@@ -18,9 +18,11 @@ Animal::Animal() {
 
   // Create legs
   for (int i = 0; i < sizeof(legs) / sizeof(legs[0]); i++) {
-    for (int j = 0; j < 2; j++) {
-      legs[i].segments.push_back(Segment{Vec2{0, 0}, Vec2{0, 0}, 30, 0});
-    }
+    // for (int j = 0; j < 2; j++) {
+    //   legs[i].segments.push_back(Segment{Vec2{0, 0}, Vec2{0, 0}, 30, 0});
+    // }
+    legs[i].segments.push_back(Segment{Vec2{0, 0}, Vec2{0, 0}, 30, 0});
+    legs[i].segments.push_back(Segment{Vec2{0, 0}, Vec2{0, 0}, 30, 0});
   }
 }
 Animal::~Animal() {}
@@ -52,26 +54,26 @@ void Animal::attachLegs() {
 }
 
 void Animal::setTargets(UI *ui) {
-  const int DIST_FROM_SPINE = 60;
+  const int DIST_FROM_SPINE = 50;
   legs[0].target =
-      Vec2{body[legBase[0]].pos[0] +
+      Vec2{body[legBase[0] - 2].pos[0] +
                cos(body[legBase[0] - 2].angle + M_PI / 2) * DIST_FROM_SPINE,
-           body[legBase[0]].pos[1] +
+           body[legBase[0] - 2].pos[1] +
                sin(body[legBase[0] - 2].angle + M_PI / 2) * DIST_FROM_SPINE};
   legs[1].target =
-      Vec2{body[legBase[1]].pos[0] +
+      Vec2{body[legBase[1] - 2].pos[0] +
                cos(body[legBase[1] - 2].angle - M_PI / 2) * DIST_FROM_SPINE,
-           body[legBase[1]].pos[1] +
+           body[legBase[1] - 2].pos[1] +
                sin(body[legBase[1] - 2].angle - M_PI / 2) * DIST_FROM_SPINE};
   legs[2].target =
-      Vec2{body[legBase[2]].pos[0] +
+      Vec2{body[legBase[2] - 2].pos[0] +
                cos(body[legBase[2] - 2].angle + M_PI / 2) * DIST_FROM_SPINE,
            body[legBase[2]].pos[1] +
                sin(body[legBase[2] - 2].angle + M_PI / 2) * DIST_FROM_SPINE};
   legs[3].target =
-      Vec2{body[legBase[3]].pos[0] +
+      Vec2{body[legBase[3] - 2].pos[0] +
                cos(body[legBase[3] - 2].angle - M_PI / 2) * DIST_FROM_SPINE,
-           body[legBase[3]].pos[1] +
+           body[legBase[3] - 2].pos[1] +
                sin(body[legBase[3] - 2].angle - M_PI / 2) * DIST_FROM_SPINE};
   for (int i = 0; i < 4; i++) {
     // ui->DrawCircle(legs[i].target.x, legs[i].target.y, 5);
@@ -214,27 +216,6 @@ void Animal::calculateDrawPoints() {
         body[i].pos[1] + body[i].size * sin(body[i].angle - M_PI / 2);
   }
 
-  // Head
-  // TODO: replace by arc
-  head.drawPoints[0].x =
-      body[0].pos[0] + body[0].size * cos(body[0].angle + M_PI / 3);
-  head.drawPoints[0].y =
-      body[0].pos[1] + body[0].size * sin(body[0].angle + M_PI / 3);
-  head.drawPoints[1].x =
-      body[0].pos[0] + body[0].size * cos(body[0].angle + M_PI / 6);
-  head.drawPoints[1].y =
-      body[0].pos[1] + body[0].size * sin(body[0].angle + M_PI / 6);
-  head.drawPoints[2].x = body[0].pos[0] + body[0].size * cos(body[0].angle);
-  head.drawPoints[2].y = body[0].pos[1] + body[0].size * sin(body[0].angle);
-  head.drawPoints[3].x =
-      body[0].pos[0] + body[0].size * cos(body[0].angle - M_PI / 6);
-  head.drawPoints[3].y =
-      body[0].pos[1] + body[0].size * sin(body[0].angle - M_PI / 6);
-  head.drawPoints[4].x =
-      body[0].pos[0] + body[0].size * cos(body[0].angle - M_PI / 3);
-  head.drawPoints[4].y =
-      body[0].pos[1] + body[0].size * sin(body[0].angle - M_PI / 3);
-
   // Legs
   for (int i = 0; i < 4; i++) {
     legs[i].drawPoints[0].left.x =
@@ -307,31 +288,14 @@ void Animal::drawLinks(UI *ui) {
   }
 
   // Head
-  // TODO: Half dome draw function
-  SDL_RenderDrawLine(ui->getRenderer(), body[0].drawPoints.left.x,
-                     body[0].drawPoints.left.y, head.drawPoints[0].x,
-                     head.drawPoints[0].y);
-  SDL_RenderDrawLine(ui->getRenderer(), head.drawPoints[0].x,
-                     head.drawPoints[0].y, head.drawPoints[1].x,
-                     head.drawPoints[1].y);
-  SDL_RenderDrawLine(ui->getRenderer(), head.drawPoints[1].x,
-                     head.drawPoints[1].y, head.drawPoints[2].x,
-                     head.drawPoints[2].y);
-  SDL_RenderDrawLine(ui->getRenderer(), head.drawPoints[2].x,
-                     head.drawPoints[2].y, head.drawPoints[3].x,
-                     head.drawPoints[3].y);
-  SDL_RenderDrawLine(ui->getRenderer(), head.drawPoints[3].x,
-                     head.drawPoints[3].y, head.drawPoints[4].x,
-                     head.drawPoints[4].y);
-  SDL_RenderDrawLine(ui->getRenderer(), head.drawPoints[4].x,
-                     head.drawPoints[4].y, body[0].drawPoints.right.x,
-                     body[0].drawPoints.right.y);
+  ui->DrawArc({body[0].pos[0], body[0].pos[1]}, body[0].size,
+              body[0].angle - M_PI / 2, body[0].angle + M_PI / 2);
 
   // Eyes
   ui->DrawCircle(
       body[0].pos[0] + body[0].size / 2 * cos(body[0].angle + M_PI / 3),
-      body[0].pos[1] + body[0].size / 2 * sin(body[0].angle + M_PI / 3), 3);
+      body[0].pos[1] + body[0].size / 2 * sin(body[0].angle + M_PI / 3), 4);
   ui->DrawCircle(
       body[0].pos[0] + body[0].size / 2 * cos(body[0].angle - M_PI / 3),
-      body[0].pos[1] + body[0].size / 2 * sin(body[0].angle - M_PI / 3), 3);
+      body[0].pos[1] + body[0].size / 2 * sin(body[0].angle - M_PI / 3), 4);
 }

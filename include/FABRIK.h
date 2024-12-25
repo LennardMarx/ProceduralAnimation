@@ -38,11 +38,11 @@ public:
 
   void pullToTarget(std::deque<Segment> &segments) {
     segments.back().end = target;
-    std::cout << "back(): " << segments.back().end.x << ", "
-              << segments.back().end.y << std::endl;
+    // std::cout << "back(): " << segments.back().end.x << ", "
+    //           << segments.back().end.y << std::endl;
 
-    std::cout << "[]: " << segments[segments.size() - 1].end.x << ", "
-              << segments[segments.size() - 1].end.y << std::endl;
+    // std::cout << "[]: " << segments[segments.size() - 1].end.x << ", "
+    //           << segments[segments.size() - 1].end.y << std::endl;
     // std::cout << "Size: " << segments.size() << std::endl;
     for (int i = segments.size() - 1; i >= 0; i--) {
       float dx = segments[i].end.x - segments[i].start.x;

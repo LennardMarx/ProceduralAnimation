@@ -1,6 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
+#include "structs.h"
 #include <SDL2/SDL.h>
 
 class UI {
@@ -18,6 +19,7 @@ public:
   void DrawCircle(int32_t centreX, int32_t centreY, int32_t radius);
   void DrawArc(int32_t centreX, int32_t centreY, int32_t radius,
                float startAngle, float endAngle);
+  void DrawArc(Vec2 center, float radius, float startAngle, float endAngle);
   SDL_Renderer *&getRenderer(); // pointer reference to the renderer
   SDL_Window *getWindow();      // pointer to the window
   bool getQuit();
