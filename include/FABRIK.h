@@ -33,7 +33,7 @@ public:
   void setBase(Vec2 b) { base = b; }
 
   void pullToTarget(std::deque<Segment> &segments) {
-    segments.back().end = target;
+    // segments.back().end = target;
 
     // std::cout << "Size: " << segments.size() << std::endl;
     for (int i = segments.size() - 1; i >= 0; i--) {
@@ -57,7 +57,7 @@ public:
   }
 
   void pullToBase(std::deque<Segment> &segments) {
-    segments.front().start = base;
+    // segments.front().start = base;
 
     for (int i = 0; i < segments.size(); i++) {
       float dx = segments[i].end.x - segments[i].start.x;
