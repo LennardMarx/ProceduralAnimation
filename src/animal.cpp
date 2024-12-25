@@ -15,6 +15,13 @@ Animal::Animal() {
     body[i].pos[1] = i * -linkLength; // Stack segments vertically
     body[i].size = segmentSizes[i];
   }
+
+  // Create legs
+  for (int i = 0; i < sizeof(legs) / sizeof(legs[0]); i++) {
+    for (int j = 0; j < 2; j++) {
+      legs[i].segments.push_back(Segment{Vec2{0, 0}, Vec2{0, 0}, 30, 0});
+    }
+  }
 }
 Animal::~Animal() {}
 
@@ -23,13 +30,52 @@ void Animal::followMouse(UI *ui) {
   body[0].pos[0] += (ui->mouseX - body[0].pos[0]) * speed;
   body[0].pos[1] += (ui->mouseY - body[0].pos[1]) * speed;
 
-  moveBody(1);
-  moveLegs();
-
   calculateDrawPoints();
+
+  attachLegs();
+  setTargets(ui);
+
+  moveBody(1);
+  // moveLegs();
 
   drawLinks(ui);
   drawLegs(ui);
+}
+
+void Animal::attachLegs() {
+  legs[0].segments.front().start = body[legBase[0]].drawPoints.left;
+  legs[1].segments.front().start = body[legBase[1]].drawPoints.right;
+  legs[2].segments.front().start = body[legBase[2]].drawPoints.left;
+  legs[3].segments.front().start = body[legBase[3]].drawPoints.right;
+  // std::cout << "Start: " << legs[0].segments.front().start.x << ", "
+  //           << legs[0].segments.front().start.y << std::endl;
+}
+
+void Animal::setTargets(UI *ui) {
+  const int DIST_FROM_SPINE = 60;
+  legs[0].target =
+      Vec2{body[legBase[0]].pos[0] +
+               cos(body[legBase[0] - 2].angle + M_PI / 2) * DIST_FROM_SPINE,
+           body[legBase[0]].pos[1] +
+               sin(body[legBase[0] - 2].angle + M_PI / 2) * DIST_FROM_SPINE};
+  legs[1].target =
+      Vec2{body[legBase[1]].pos[0] +
+               cos(body[legBase[1] - 2].angle - M_PI / 2) * DIST_FROM_SPINE,
+           body[legBase[1]].pos[1] +
+               sin(body[legBase[1] - 2].angle - M_PI / 2) * DIST_FROM_SPINE};
+  legs[2].target =
+      Vec2{body[legBase[2]].pos[0] +
+               cos(body[legBase[2] - 2].angle + M_PI / 2) * DIST_FROM_SPINE,
+           body[legBase[2]].pos[1] +
+               sin(body[legBase[2] - 2].angle + M_PI / 2) * DIST_FROM_SPINE};
+  legs[3].target =
+      Vec2{body[legBase[3]].pos[0] +
+               cos(body[legBase[3] - 2].angle - M_PI / 2) * DIST_FROM_SPINE,
+           body[legBase[3]].pos[1] +
+               sin(body[legBase[3] - 2].angle - M_PI / 2) * DIST_FROM_SPINE};
+  for (int i = 0; i < 4; i++) {
+    // ui->DrawCircle(legs[i].target.x, legs[i].target.y, 5);
+  }
 }
 
 void Animal::moveLegs() {
@@ -58,30 +104,30 @@ void Animal::moveLegs() {
   legs[3].elbowTarget.x = body[12].pos[0] + 50 * cos(body[12].angle - M_PI / 3);
   legs[3].elbowTarget.y = body[12].pos[1] + 50 * sin(body[12].angle - M_PI / 3);
 
-  for (int i = 0; i < 4; i++) {
-
-    // Angles
-    float dx = legs[i].pos[1].x - legs[i].pos[0].x;
-    float dy = legs[i].pos[1].y - legs[i].pos[0].y;
-    float distance = sqrt(dx * dx + dy * dy);
-    legs[i].angles[0] = atan2(dy, dx);
-    dx = legs[i].pos[2].x - legs[i].pos[1].x;
-    dy = legs[i].pos[2].y - legs[i].pos[1].y;
-    distance = sqrt(dx * dx + dy * dy);
-    legs[i].angles[1] = atan2(dy, dx);
-
-    // FABRIK
-    dx = legs[i].fabrik.target.x - legs[i].target.x;
-    dy = legs[i].fabrik.target.y - legs[i].target.y;
-    distance = sqrt(dx * dx + dy * dy);
-
-    if (distance > 40) {
-      legs[i].fabrik.setTarget(legs[i].target);
-      legs[i].fabrik.setElbowTarget(legs[i].elbowTarget);
-    }
-    legs[i].fabrik.setBase(legs[i].pos[0]);
-    legs[i].fabrik.solve(legs[i].pos);
-  }
+  // for (int i = 0; i < 4; i++) {
+  //
+  //   // Angles
+  //   float dx = legs[i].pos[1].x - legs[i].pos[0].x;
+  //   float dy = legs[i].pos[1].y - legs[i].pos[0].y;
+  //   float distance = sqrt(dx * dx + dy * dy);
+  //   legs[i].angles[0] = atan2(dy, dx);
+  //   dx = legs[i].pos[2].x - legs[i].pos[1].x;
+  //   dy = legs[i].pos[2].y - legs[i].pos[1].y;
+  //   distance = sqrt(dx * dx + dy * dy);
+  //   legs[i].angles[1] = atan2(dy, dx);
+  //
+  //   // FABRIK
+  //   dx = legs[i].fabrik.target.x - legs[i].target.x;
+  //   dy = legs[i].fabrik.target.y - legs[i].target.y;
+  //   distance = sqrt(dx * dx + dy * dy);
+  //
+  //   if (distance > 40) {
+  //     legs[i].fabrik.setTarget(legs[i].target);
+  //     legs[i].fabrik.setElbowTarget(legs[i].elbowTarget);
+  //   }
+  //   legs[i].fabrik.setBase(legs[i].pos[0]);
+  //   legs[i].fabrik.solve(legs[i].pos);
+  // }
 }
 
 void Animal::drawLegs(UI *ui) {
@@ -92,22 +138,28 @@ void Animal::drawLegs(UI *ui) {
     ui->DrawCircle(legs[i].pos[2].x, legs[i].pos[2].y, 7);
 
     // Outline of legs
-    SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[0].left.x,
-                       legs[i].drawPoints[0].left.y,
-                       legs[i].drawPoints[1].left.x,
-                       legs[i].drawPoints[1].left.y);
-    SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[0].right.x,
-                       legs[i].drawPoints[0].right.y,
-                       legs[i].drawPoints[1].right.x,
-                       legs[i].drawPoints[1].right.y);
-    SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[2].right.x,
-                       legs[i].drawPoints[2].right.y,
-                       legs[i].drawPoints[3].right.x,
-                       legs[i].drawPoints[3].right.y);
-    SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[2].left.x,
-                       legs[i].drawPoints[2].left.y,
-                       legs[i].drawPoints[3].left.x,
-                       legs[i].drawPoints[3].left.y);
+    // SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[0].left.x,
+    //                    legs[i].drawPoints[0].left.y,
+    //                    legs[i].drawPoints[1].left.x,
+    //                    legs[i].drawPoints[1].left.y);
+    // SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[0].right.x,
+    //                    legs[i].drawPoints[0].right.y,
+    //                    legs[i].drawPoints[1].right.x,
+    //                    legs[i].drawPoints[1].right.y);
+    // SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[2].right.x,
+    //                    legs[i].drawPoints[2].right.y,
+    //                    legs[i].drawPoints[3].right.x,
+    //                    legs[i].drawPoints[3].right.y);
+    // SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[2].left.x,
+    //                    legs[i].drawPoints[2].left.y,
+    //                    legs[i].drawPoints[3].left.x,
+    //                    legs[i].drawPoints[3].left.y);
+
+    for (int j = 0; j < legs[i].segments.size(); j++) {
+      SDL_RenderDrawLine(ui->getRenderer(), legs[i].segments[j].start.x,
+                         legs[i].segments[j].start.y, legs[i].segments[j].end.x,
+                         legs[i].segments[j].end.y);
+    }
   }
 }
 

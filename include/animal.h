@@ -25,7 +25,7 @@ struct Bone {
 };
 
 struct Leg {
-  Segment segments[2];
+  std::deque<Segment> segments;
 
   Bone bones[2];
   Vec2 pos[3];
@@ -65,20 +65,26 @@ public:
   void calculateDrawPoints();
   float normalizeAngle(float angle);
   void moveLegs();
+  void moveLegs2();
   void drawLegs(UI *ui);
 
+  void attachLegs();
+  void setTargets(UI *ui);
   // std::deque<Segment> body;
-  std::deque<Segment> leg[4];
+
+  Leg legs[4];
 
 private:
+  // std::deque<Segment> leg[4];
   float linkLength;
   float minAngle;
   float speed;
 
+  int legBase[4]{5, 5, 12, 12};
+
   static const int numJoints = 20;
   Head head;
   SpineSegment body[numJoints];
-  Leg legs[4];
 };
 
 #endif // ANIMAL_H

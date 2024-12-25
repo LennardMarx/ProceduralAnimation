@@ -5,8 +5,8 @@
 #include <memory>
 
 struct Vec2 {
-  float x;
-  float y;
+  double x;
+  double y;
 };
 
 struct Segment {
@@ -18,7 +18,8 @@ struct Segment {
   float length;
   float angle;
 
-  // Segment(std::shared_ptr<Vec2> start, std::shared_ptr<Vec2> end, float length,
+  // Segment(std::shared_ptr<Vec2> start, std::shared_ptr<Vec2> end, float
+  // length,
   //         float angle)
   //     : start(std::move(start)), end(std::move(end)), length(length),
   //       angle(angle) {}

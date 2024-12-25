@@ -35,14 +35,14 @@ public:
   void pullToTarget(std::deque<Segment> &segments) {
     segments.back().end = target;
 
-    std::cout << "Size: " << segments.size() << std::endl;
+    // std::cout << "Size: " << segments.size() << std::endl;
     for (int i = segments.size() - 1; i >= 0; i--) {
       float dx = segments[i].end.x - segments[i].start.x;
       float dy = segments[i].end.y - segments[i].start.y;
       float distance = sqrt(dx * dx + dy * dy);
       segments[i].angle = atan2(dy, dx);
 
-      std::cout << "Angle: " << segments[i].angle << std::endl;
+      // std::cout << "Angle: " << segments[i].angle << std::endl;
 
       segments[i].start.x =
           segments[i].end.x - cos(segments[i].angle) * segments[i].length;
