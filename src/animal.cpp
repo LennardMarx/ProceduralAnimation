@@ -135,9 +135,9 @@ void Animal::moveLegs() {
 void Animal::drawLegs(UI *ui) {
   for (int i = 0; i < 4; i++) {
     // Joints
-    ui->DrawCircle(legs[i].pos[0].x, legs[i].pos[0].y, 7);
-    ui->DrawCircle(legs[i].pos[1].x, legs[i].pos[1].y, 7);
-    ui->DrawCircle(legs[i].pos[2].x, legs[i].pos[2].y, 7);
+    // ui->DrawCircle(legs[i].pos[0].x, legs[i].pos[0].y, 7);
+    // ui->DrawCircle(legs[i].pos[1].x, legs[i].pos[1].y, 7);
+    // ui->DrawCircle(legs[i].pos[2].x, legs[i].pos[2].y, 7);
 
     // Outline of legs
     // SDL_RenderDrawLine(ui->getRenderer(), legs[i].drawPoints[0].left.x,
@@ -288,6 +288,9 @@ void Animal::drawLinks(UI *ui) {
   }
 
   // Head
+  // arcRGBA(ui->getRenderer(), body[0].pos[0], body[0].pos[1], body[0].size,
+  //         (body[0].angle - M_PI / 2) / M_PI * 180.0,
+  //         (body[0].angle + M_PI / 2) / M_PI * 180.0, 249, 245, 215, 255);
   ui->DrawArc({body[0].pos[0], body[0].pos[1]}, body[0].size,
               body[0].angle - M_PI / 2, body[0].angle + M_PI / 2);
 
