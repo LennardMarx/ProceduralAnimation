@@ -24,6 +24,10 @@ struct Bone {
   Bone *prev;
 };
 
+struct Spine {
+  std::deque<Segment> segments;
+};
+
 struct Leg {
   std::deque<Segment> segments;
   Vec2 target;
@@ -66,13 +70,20 @@ public:
   float normalizeAngle(float angle);
   void moveLegs();
   void moveLegs2();
+
+  void moveSpine();
+
   void drawLegs(UI *ui);
+  void drawSpine(UI *ui);
 
   void attachLegs();
   void setTargets(UI *ui);
-  // std::deque<Segment> body;
+
+  const Leg &getLeg(int index) const;
+  const Spine &getSpine() const;
 
   Leg legs[4];
+  Spine spine;
 
 private:
   // std::deque<Segment> leg[4];

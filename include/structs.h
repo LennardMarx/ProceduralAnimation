@@ -17,6 +17,7 @@ struct Segment {
 
   float length;
   float angle;
+  float size;
 
   // Segment(std::shared_ptr<Vec2> start, std::shared_ptr<Vec2> end, float
   // length,
