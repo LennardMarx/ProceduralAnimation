@@ -1,3 +1,4 @@
+#include <SDL2/SDL_render.h>
 #include <animal.h>
 #include <iostream>
 
@@ -133,6 +134,7 @@ void Animal::moveLegs() {
 }
 
 void Animal::drawLegs(UI *ui) {
+  float LEG_THICKNESS = 10.0;
   for (int i = 0; i < 4; i++) {
     // Joints
     // ui->DrawCircle(legs[i].pos[0].x, legs[i].pos[0].y, 7);
@@ -161,7 +163,108 @@ void Animal::drawLegs(UI *ui) {
       SDL_RenderDrawLine(ui->getRenderer(), legs[i].segments[j].start.x,
                          legs[i].segments[j].start.y, legs[i].segments[j].end.x,
                          legs[i].segments[j].end.y);
+      float dx = legs[i].segments[j].end.x - legs[i].segments[j].start.x;
+      float dy = legs[i].segments[j].end.y - legs[i].segments[j].start.y;
+      // float distance = sqrt(dx * dx + dy * dy);
+      // legs[i].angles[1] = normalizeAngle(atan2(dy, dx));
+      legs[i].segments[j].angle = normalizeAngle(atan2(dy, dx));
     }
+
+    // Calculate angle of distal leg segment
+    // float dx = legs[i].segments[1].end.x - legs[i].segments[1].start.x;
+    // float dy = legs[i].segments[1].end.y - legs[i].segments[1].start.y;
+    // float distance = sqrt(dx * dx + dy * dy);
+    // legs[i].angles[1] = normalizeAngle(atan2(dy, dx));
+    // legs[i].segments[1].angle = normalizeAngle(atan2(dy, dx));
+    // std::cout << "Leg angles " << i << ": " << legs[i].angles[1] <<
+    // std::endl;
+
+    // Drawing "feet"
+    ui->DrawArc(legs[i].segments[1].end, LEG_THICKNESS,
+                legs[i].segments[1].angle - M_PI / 2,
+                legs[i].segments[1].angle + M_PI / 2);
+
+    // Right side
+    if (i % 2 == 0) {
+      // Elbows
+      ui->DrawArc(legs[i].segments[0].end, LEG_THICKNESS,
+                  legs[i].segments[1].angle + M_PI / 2,
+                  legs[i].segments[0].angle + M_PI / 2);
+
+      // Distal arm outside
+      SDL_RenderDrawLine(
+          ui->getRenderer(),
+          legs[i].segments[1].end.x +
+              LEG_THICKNESS * cos(legs[i].segments[1].angle + M_PI / 2),
+          legs[i].segments[1].end.y +
+              LEG_THICKNESS * sin(legs[i].segments[1].angle + M_PI / 2),
+          legs[i].segments[1].start.x +
+              LEG_THICKNESS * cos(legs[i].segments[1].angle + M_PI / 2),
+          legs[i].segments[1].start.y +
+              LEG_THICKNESS * sin(legs[i].segments[1].angle + M_PI / 2));
+
+      // Left side
+    } else {
+      // Elbows
+      ui->DrawArc(legs[i].segments[0].end, LEG_THICKNESS,
+                  legs[i].segments[0].angle - M_PI / 2,
+                  legs[i].segments[1].angle - M_PI / 2);
+
+      // Distal arm outside
+      SDL_RenderDrawLine(
+          ui->getRenderer(),
+          legs[i].segments[1].end.x +
+              LEG_THICKNESS * cos(legs[i].segments[1].angle - M_PI / 2),
+          legs[i].segments[1].end.y +
+              LEG_THICKNESS * sin(legs[i].segments[1].angle - M_PI / 2),
+          legs[i].segments[1].start.x +
+              LEG_THICKNESS * cos(legs[i].segments[1].angle - M_PI / 2),
+          legs[i].segments[1].start.y +
+              LEG_THICKNESS * sin(legs[i].segments[1].angle - M_PI / 2));
+    }
+
+    // Crook
+    // Middeling angle
+    // float angle1 = legs[i].segments[0].angle;
+    // float angle2 = legs[i].segments[1].angle;
+    //
+    // float x = cos(legs[i].segments[0].angle) +
+    // cos(legs[i].segments[1].angle); float y = sin(legs[i].segments[0].angle)
+    // + sin(legs[i].segments[1].angle);
+    //
+    // float middle_angle = atan2(y, x);
+    float middle_angle =
+        (legs[i].segments[0].angle + legs[i].segments[1].angle + M_PI) / 2.0;
+
+    std::cout << "Leg angles " << i << ": " << legs[i].segments[0].angle << ", "
+              << middle_angle << ", " << legs[i].segments[1].angle << std::endl;
+
+    // SDL_RenderDrawPoint(
+    //     ui->getRenderer(),
+    //     legs[i].segments[0].end.x + 2 * LEG_THICKNESS * sin(middle_angle),
+    //     legs[i].segments[0].end.y + 2 * LEG_THICKNESS * cos(middle_angle));
+    SDL_RenderDrawPoint(ui->getRenderer(),
+                        legs[i].segments[0].end.x +
+                            2 * LEG_THICKNESS * cos(legs[i].segments[0].angle),
+                        legs[i].segments[0].end.y +
+                            2 * LEG_THICKNESS * sin(legs[i].segments[0].angle));
+    SDL_RenderDrawPoint(ui->getRenderer(),
+                        legs[i].segments[0].end.x -
+                            2 * LEG_THICKNESS * cos(legs[i].segments[1].angle),
+                        legs[i].segments[0].end.y -
+                            2 * LEG_THICKNESS * sin(legs[i].segments[1].angle));
+    SDL_RenderDrawPoint(
+        ui->getRenderer(),
+        legs[i].segments[0].end.x - 2 * LEG_THICKNESS * cos(middle_angle),
+        legs[i].segments[0].end.y - 2 * LEG_THICKNESS * sin(middle_angle));
+
+    // float point_1x = legs[i].segments[1].end.x +
+    //                  LEG_THICKNESS * cos(legs[i].segments[1].angle + M_PI /
+    //                  2);
+    // float point_1y = legs[i].segments[1].end.y +
+    //                  LEG_THICKNESS * sin(legs[i].segments[1].angle + M_PI /
+    //                  2);
+    // SDL_RenderDrawPoint(ui->getRenderer(), point_1x, point_1y);
   }
 }
 
@@ -216,41 +319,50 @@ void Animal::calculateDrawPoints() {
         body[i].pos[1] + body[i].size * sin(body[i].angle - M_PI / 2);
   }
 
+  float LEG_THICKNESS = 10.0;
   // Legs
   for (int i = 0; i < 4; i++) {
-    legs[i].drawPoints[0].left.x =
-        legs[i].pos[0].x + 7 * cos(legs[i].angles[0] + M_PI / 2);
-    legs[i].drawPoints[0].left.y =
-        legs[i].pos[0].y + 7 * sin(legs[i].angles[0] + M_PI / 2);
-    legs[i].drawPoints[0].right.x =
-        legs[i].pos[0].x - 7 * cos(legs[i].angles[0] + M_PI / 2);
-    legs[i].drawPoints[0].right.y =
-        legs[i].pos[0].y - 7 * sin(legs[i].angles[0] + M_PI / 2);
-    legs[i].drawPoints[1].left.x =
-        legs[i].pos[1].x + 7 * cos(legs[i].angles[0] + M_PI / 2);
-    legs[i].drawPoints[1].left.y =
-        legs[i].pos[1].y + 7 * sin(legs[i].angles[0] + M_PI / 2);
-    legs[i].drawPoints[1].right.x =
-        legs[i].pos[1].x - 7 * cos(legs[i].angles[0] + M_PI / 2);
-    legs[i].drawPoints[1].right.y =
-        legs[i].pos[1].y - 7 * sin(legs[i].angles[0] + M_PI / 2);
-    legs[i].drawPoints[2].left.x =
-        legs[i].pos[1].x + 7 * cos(legs[i].angles[1] + M_PI / 2);
-    legs[i].drawPoints[2].left.y =
-        legs[i].pos[1].y + 7 * sin(legs[i].angles[1] + M_PI / 2);
-    legs[i].drawPoints[2].right.x =
-        legs[i].pos[1].x - 7 * cos(legs[i].angles[1] + M_PI / 2);
-    legs[i].drawPoints[2].right.y =
-        legs[i].pos[1].y - 7 * sin(legs[i].angles[1] + M_PI / 2);
-    legs[i].drawPoints[3].left.x =
-        legs[i].pos[2].x + 7 * cos(legs[i].angles[1] + M_PI / 2);
-    legs[i].drawPoints[3].left.y =
-        legs[i].pos[2].y + 7 * sin(legs[i].angles[1] + M_PI / 2);
-    legs[i].drawPoints[3].right.x =
-        legs[i].pos[2].x - 7 * cos(legs[i].angles[1] + M_PI / 2);
-    legs[i].drawPoints[3].right.y =
-        legs[i].pos[2].y - 7 * sin(legs[i].angles[1] + M_PI / 2);
+    float point_1x = legs[i].segments[1].end.x +
+                     LEG_THICKNESS * cos(legs[i].segments[1].angle + M_PI / 2);
+    float point_1y = legs[i].segments[1].end.y +
+                     LEG_THICKNESS * sin(legs[i].segments[1].angle + M_PI / 2);
   }
+
+  // Legs
+  // for (int i = 0; i < 4; i++) {
+  //   legs[i].drawPoints[0].left.x =
+  //       legs[i].pos[0].x + 7 * cos(legs[i].angles[0] + M_PI / 2);
+  //   legs[i].drawPoints[0].left.y =
+  //       legs[i].pos[0].y + 7 * sin(legs[i].angles[0] + M_PI / 2);
+  //   legs[i].drawPoints[0].right.x =
+  //       legs[i].pos[0].x - 7 * cos(legs[i].angles[0] + M_PI / 2);
+  //   legs[i].drawPoints[0].right.y =
+  //       legs[i].pos[0].y - 7 * sin(legs[i].angles[0] + M_PI / 2);
+  //   legs[i].drawPoints[1].left.x =
+  //       legs[i].pos[1].x + 7 * cos(legs[i].angles[0] + M_PI / 2);
+  //   legs[i].drawPoints[1].left.y =
+  //       legs[i].pos[1].y + 7 * sin(legs[i].angles[0] + M_PI / 2);
+  //   legs[i].drawPoints[1].right.x =
+  //       legs[i].pos[1].x - 7 * cos(legs[i].angles[0] + M_PI / 2);
+  //   legs[i].drawPoints[1].right.y =
+  //       legs[i].pos[1].y - 7 * sin(legs[i].angles[0] + M_PI / 2);
+  //   legs[i].drawPoints[2].left.x =
+  //       legs[i].pos[1].x + 7 * cos(legs[i].angles[1] + M_PI / 2);
+  //   legs[i].drawPoints[2].left.y =
+  //       legs[i].pos[1].y + 7 * sin(legs[i].angles[1] + M_PI / 2);
+  //   legs[i].drawPoints[2].right.x =
+  //       legs[i].pos[1].x - 7 * cos(legs[i].angles[1] + M_PI / 2);
+  //   legs[i].drawPoints[2].right.y =
+  //       legs[i].pos[1].y - 7 * sin(legs[i].angles[1] + M_PI / 2);
+  //   legs[i].drawPoints[3].left.x =
+  //       legs[i].pos[2].x + 7 * cos(legs[i].angles[1] + M_PI / 2);
+  //   legs[i].drawPoints[3].left.y =
+  //       legs[i].pos[2].y + 7 * sin(legs[i].angles[1] + M_PI / 2);
+  //   legs[i].drawPoints[3].right.x =
+  //       legs[i].pos[2].x - 7 * cos(legs[i].angles[1] + M_PI / 2);
+  //   legs[i].drawPoints[3].right.y =
+  //       legs[i].pos[2].y - 7 * sin(legs[i].angles[1] + M_PI / 2);
+  // }
 
   // for (int i = 0; i < 4; i++) {
   //   for (int j = 0; j < 4; j++) {

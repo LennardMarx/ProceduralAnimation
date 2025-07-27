@@ -1,4 +1,5 @@
 #include <FABRIK.h>
+#include <SDL2/SDL_render.h>
 #include <UI.h>
 #include <animal.h>
 #include <iostream>
@@ -34,6 +35,9 @@ static void mainLoop(void *arg) {
     //                    ctx->animal.legs[i].segments.back().end.y, 10);
 
     // std::cout << "Distance: " << distance << std::endl;
+    // ctx->animal.legs[i].angles[1] = (atan2(dy, dx));
+    // std::cout << "Leg angles " << i << ": " << ctx->animal.legs[i].angles[1]
+    //           << std::endl;
 
     if (distance > 50) {
       ctx->fabrik[i].setTarget(ctx->animal.legs[i].target);

@@ -56,18 +56,32 @@ void UI::DrawCircle(int32_t centreX, int32_t centreY, int32_t radius) {
 }
 
 void UI::DrawArc(Vec2 center, float radius, float startAngle, float endAngle) {
+  // Wrap angle
+  if (endAngle < startAngle)
+    endAngle += 2 * M_PI;
+
   int degrees = (endAngle - startAngle) * 180 / M_PI;
+  // int degrees =
+  //     std::max(1, static_cast<int>((endAngle - startAngle) * 180 / M_PI));
   // start point
   float x_prev = center.x + radius * cos(startAngle) + 0.5;
   float y_prev = center.y + radius * sin(startAngle) + 0.5;
-  for (int i = 0; i < degrees; i++) {
-    // for (int i = 0; i < degrees; i = i + 3) {
+  // for (int i = 0; i < degrees; i++) {
+  // for (int i = 0; i < degrees; i += 2) {
+  for (int i = 0; i < degrees; i = i + 4) {
     float angle = startAngle + i * M_PI / 180;
 
     float x = center.x + radius * cos(angle) + 0.5;
     float y = center.y + radius * sin(angle) + 0.5;
 
-    SDL_RenderDrawLine(renderer, x_prev, y_prev, x, y);
+    // SDL_RenderDrawLine(renderer, x_prev, y_prev, x, y);
+
+    int x1 = static_cast<int>(x_prev);
+    int y1 = static_cast<int>(y_prev);
+    int x2 = static_cast<int>(x);
+    int y2 = static_cast<int>(y);
+    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+
     x_prev = x;
     y_prev = y;
   }
