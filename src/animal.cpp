@@ -1,6 +1,8 @@
 #include <SDL2/SDL_render.h>
 #include <animal.h>
+#include <cmath>
 #include <iostream>
+#include <structs.h>
 
 Animal::Animal() {
   linkLength = 15.0f;
@@ -134,7 +136,7 @@ void Animal::moveLegs() {
 }
 
 void Animal::drawLegs(UI *ui) {
-  float LEG_THICKNESS = 10.0;
+  float LEG_THICKNESS = 8.0;
   for (int i = 0; i < 4; i++) {
     // Joints
     // ui->DrawCircle(legs[i].pos[0].x, legs[i].pos[0].y, 7);
@@ -160,9 +162,10 @@ void Animal::drawLegs(UI *ui) {
     //                    legs[i].drawPoints[3].left.y);
 
     for (int j = 0; j < legs[i].segments.size(); j++) {
-      SDL_RenderDrawLine(ui->getRenderer(), legs[i].segments[j].start.x,
-                         legs[i].segments[j].start.y, legs[i].segments[j].end.x,
-                         legs[i].segments[j].end.y);
+      // SDL_RenderDrawLine(ui->getRenderer(), legs[i].segments[j].start.x,
+      //                    legs[i].segments[j].start.y,
+      //                    legs[i].segments[j].end.x,
+      //                    legs[i].segments[j].end.y);
       float dx = legs[i].segments[j].end.x - legs[i].segments[j].start.x;
       float dy = legs[i].segments[j].end.y - legs[i].segments[j].start.y;
       // float distance = sqrt(dx * dx + dy * dy);
@@ -183,9 +186,46 @@ void Animal::drawLegs(UI *ui) {
     ui->DrawArc(legs[i].segments[1].end, LEG_THICKNESS,
                 legs[i].segments[1].angle - M_PI / 2,
                 legs[i].segments[1].angle + M_PI / 2);
+    // Drawing "shoulders"
+    // ui->DrawArc(legs[i].segments[0].start, LEG_THICKNESS,
+    //             legs[i].segments[0].angle + M_PI / 2,
+    //             legs[i].segments[0].angle - M_PI / 2);
 
+    Vec2 humerus_elbow = {0, 0};
+    Vec2 ulna_elbow = {0, 0};
+    Vec2 radius_hand = {0, 0};
+    Vec2 shoulder_front = {0, 0};
+    Vec2 shoulder_back = {0, 0};
     // Right side
     if (i % 2 == 0) {
+      humerus_elbow = {
+          legs[i].segments[0].end.x +
+              LEG_THICKNESS * cos(legs[i].segments[0].angle + M_PI / 2),
+          legs[i].segments[0].end.y +
+              LEG_THICKNESS * sin(legs[i].segments[0].angle + M_PI / 2)};
+      ulna_elbow = {
+          legs[i].segments[1].start.x +
+              LEG_THICKNESS * cos(legs[i].segments[1].angle + M_PI / 2),
+          legs[i].segments[1].start.y +
+              LEG_THICKNESS * sin(legs[i].segments[1].angle + M_PI / 2)};
+      radius_hand = {
+          legs[i].segments[1].end.x +
+              LEG_THICKNESS * cos(legs[i].segments[1].angle - M_PI / 2),
+          legs[i].segments[1].end.y +
+              LEG_THICKNESS * sin(legs[i].segments[1].angle - M_PI / 2)};
+      shoulder_front = {
+          legs[i].segments[0].start.x +
+              LEG_THICKNESS * cos(legs[i].segments[0].angle - M_PI / 2),
+          legs[i].segments[0].start.y +
+              LEG_THICKNESS * sin(legs[i].segments[0].angle - M_PI / 2)};
+      shoulder_back = {
+          legs[i].segments[0].start.x +
+              LEG_THICKNESS * cos(legs[i].segments[0].angle + M_PI / 2),
+          legs[i].segments[0].start.y +
+              LEG_THICKNESS * sin(legs[i].segments[0].angle + M_PI / 2)};
+
+      SDL_RenderDrawPoint(ui->getRenderer(), shoulder_back.x, shoulder_back.y);
+
       // Elbows
       ui->DrawArc(legs[i].segments[0].end, LEG_THICKNESS,
                   legs[i].segments[1].angle + M_PI / 2,
@@ -205,6 +245,31 @@ void Animal::drawLegs(UI *ui) {
 
       // Left side
     } else {
+      humerus_elbow = {
+          legs[i].segments[0].end.x +
+              LEG_THICKNESS * cos(legs[i].segments[0].angle - M_PI / 2),
+          legs[i].segments[0].end.y +
+              LEG_THICKNESS * sin(legs[i].segments[0].angle - M_PI / 2)};
+      ulna_elbow = {
+          legs[i].segments[1].start.x +
+              LEG_THICKNESS * cos(legs[i].segments[1].angle - M_PI / 2),
+          legs[i].segments[1].start.y +
+              LEG_THICKNESS * sin(legs[i].segments[1].angle - M_PI / 2)};
+      radius_hand = {
+          legs[i].segments[1].end.x +
+              LEG_THICKNESS * cos(legs[i].segments[1].angle + M_PI / 2),
+          legs[i].segments[1].end.y +
+              LEG_THICKNESS * sin(legs[i].segments[1].angle + M_PI / 2)};
+      shoulder_front = {
+          legs[i].segments[0].start.x +
+              LEG_THICKNESS * cos(legs[i].segments[0].angle + M_PI / 2),
+          legs[i].segments[0].start.y +
+              LEG_THICKNESS * sin(legs[i].segments[0].angle + M_PI / 2)};
+      shoulder_back = {
+          legs[i].segments[0].start.x +
+              LEG_THICKNESS * cos(legs[i].segments[0].angle - M_PI / 2),
+          legs[i].segments[0].start.y +
+              LEG_THICKNESS * sin(legs[i].segments[0].angle - M_PI / 2)};
       // Elbows
       ui->DrawArc(legs[i].segments[0].end, LEG_THICKNESS,
                   legs[i].segments[0].angle - M_PI / 2,
@@ -223,40 +288,57 @@ void Animal::drawLegs(UI *ui) {
               LEG_THICKNESS * sin(legs[i].segments[1].angle - M_PI / 2));
     }
 
-    // Crook
-    // Middeling angle
-    // float angle1 = legs[i].segments[0].angle;
-    // float angle2 = legs[i].segments[1].angle;
-    //
-    // float x = cos(legs[i].segments[0].angle) +
-    // cos(legs[i].segments[1].angle); float y = sin(legs[i].segments[0].angle)
-    // + sin(legs[i].segments[1].angle);
-    //
-    // float middle_angle = atan2(y, x);
+    // Make sure first segments angle is larger than second
+    if (legs[i].segments[0].angle < legs[i].segments[1].angle) {
+      legs[i].segments[1].angle -= 2 * M_PI;
+    }
+    // calculate angle bewteen the segments
     float middle_angle =
-        (legs[i].segments[0].angle + legs[i].segments[1].angle + M_PI) / 2.0;
+        (legs[i].segments[0].angle + legs[i].segments[1].angle) / 2.0;
 
-    std::cout << "Leg angles " << i << ": " << legs[i].segments[0].angle << ", "
-              << middle_angle << ", " << legs[i].segments[1].angle << std::endl;
+    Vec2 crook = {legs[i].segments[0].end.x -
+                      2 * LEG_THICKNESS * cos(middle_angle + M_PI / 2),
+                  legs[i].segments[0].end.y -
+                      2 * LEG_THICKNESS * sin(middle_angle + M_PI / 2)};
+    // Draw crook
+    SDL_RenderDrawPoint(ui->getRenderer(), crook.x, crook.y);
 
+    // Draw lower arm inside
+    SDL_RenderDrawLine(ui->getRenderer(), crook.x, crook.y, radius_hand.x,
+                       radius_hand.y);
+    // Draw upper arm inside
+    SDL_RenderDrawLine(ui->getRenderer(), crook.x, crook.y, shoulder_front.x,
+                       shoulder_front.y);
+    // Draw upper arm ouside
+    SDL_RenderDrawLine(ui->getRenderer(), humerus_elbow.x, humerus_elbow.y,
+                       shoulder_back.x, shoulder_back.y);
+
+    // std::cout << "Radius hand: " << radius_hand.x << ", " << radius_hand.y
+    //           << std::endl;
+
+    // =====================================
+    //
+    //
+    //
+    //
     // SDL_RenderDrawPoint(
     //     ui->getRenderer(),
     //     legs[i].segments[0].end.x + 2 * LEG_THICKNESS * sin(middle_angle),
     //     legs[i].segments[0].end.y + 2 * LEG_THICKNESS * cos(middle_angle));
-    SDL_RenderDrawPoint(ui->getRenderer(),
-                        legs[i].segments[0].end.x +
-                            2 * LEG_THICKNESS * cos(legs[i].segments[0].angle),
-                        legs[i].segments[0].end.y +
-                            2 * LEG_THICKNESS * sin(legs[i].segments[0].angle));
-    SDL_RenderDrawPoint(ui->getRenderer(),
-                        legs[i].segments[0].end.x -
-                            2 * LEG_THICKNESS * cos(legs[i].segments[1].angle),
-                        legs[i].segments[0].end.y -
-                            2 * LEG_THICKNESS * sin(legs[i].segments[1].angle));
-    SDL_RenderDrawPoint(
-        ui->getRenderer(),
-        legs[i].segments[0].end.x - 2 * LEG_THICKNESS * cos(middle_angle),
-        legs[i].segments[0].end.y - 2 * LEG_THICKNESS * sin(middle_angle));
+    // SDL_RenderDrawPoint(ui->getRenderer(),
+    //                     legs[i].segments[0].end.x +
+    //                         2 * LEG_THICKNESS *
+    //                         cos(legs[i].segments[0].angle),
+    //                     legs[i].segments[0].end.y +
+    //                         2 * LEG_THICKNESS *
+    //                         sin(legs[i].segments[0].angle));
+    // SDL_RenderDrawPoint(ui->getRenderer(),
+    //                     legs[i].segments[0].end.x -
+    //                         2 * LEG_THICKNESS *
+    //                         cos(legs[i].segments[1].angle),
+    //                     legs[i].segments[0].end.y -
+    //                         2 * LEG_THICKNESS *
+    //                         sin(legs[i].segments[1].angle));
 
     // float point_1x = legs[i].segments[1].end.x +
     //                  LEG_THICKNESS * cos(legs[i].segments[1].angle + M_PI /
